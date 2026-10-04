@@ -1,0 +1,13 @@
+# Large GGUF Models & Backups
+Models/*.gguf
+Models/*.bak
+
+# System & OS artifacts
+.DS_Store
+lost+found/
+System Volume Information/
+__pycache__/
+*.pyc
+
+# Temporary test logs
+*.log

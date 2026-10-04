@@ -1,0 +1,757 @@
+{
+  "name": "Local LLM Tri-Domain Benchmark (Coding, Tool Calling, Creative Writing)",
+  "version": "1.0",
+  "description": "Standardized 30-task multi-capability benchmark for evaluating local LLMs running via llama.cpp / llama-server router mode.",
+  "rubric": {
+    "scale": "0.00 to 10.00",
+    "precision": 0.01,
+    "domains": {
+      "Coding": {
+        "C1_logic_and_correctness": {
+          "max_score": 2.5,
+          "description": "Algorithmic soundness, edge cases (negatives, zero, empty, null), correct mathematical bounds."
+        },
+        "C2_syntax_and_completeness": {
+          "max_score": 2.5,
+          "description": "Valid code syntax, no truncation, runnable functions, proper return types."
+        },
+        "C3_idiomatic_quality": {
+          "max_score": 2.5,
+          "description": "Clean, standard structure, proper time/space complexity (e.g. O(1), O(sqrt(n))), readable naming."
+        },
+        "C4_reasoning_and_explanation": {
+          "max_score": 2.5,
+          "description": "Clarity of internal or visible reasoning trace, accurate step breakdown, good code comments."
+        }
+      },
+      "Tool Calling": {
+        "T1_tool_selection": {
+          "max_score": 2.5,
+          "description": "Accurately selecting the appropriate function, or correctly refusing to call tools when query is non-tool or informational."
+        },
+        "T2_parameter_validity": {
+          "max_score": 2.5,
+          "description": "Extracting all required parameters accurately from user text without hallucinating missing values."
+        },
+        "T3_schema_and_types": {
+          "max_score": 2.5,
+          "description": "Strict type compliance (integer vs string, boolean literals vs string, array structures, nested objects)."
+        },
+        "T4_safety_and_reasoning": {
+          "max_score": 2.5,
+          "description": "Logical justification for tool call, politely prompting user when required arguments are missing rather than guessing."
+        }
+      },
+      "Creative Writing": {
+        "W1_voice_and_tone": {
+          "max_score": 2.5,
+          "description": "Distinctive presence, matching requested persona, atmosphere, and literary genre."
+        },
+        "W2_imagery_and_craft": {
+          "max_score": 2.5,
+          "description": "Sensory depth, inventive metaphors, rhythm, avoiding repetitive AI clichés."
+        },
+        "W3_coherence_and_flow": {
+          "max_score": 2.5,
+          "description": "Narrative pacing, natural sentence variation, compelling transitions."
+        },
+        "W4_constraint_adherence": {
+          "max_score": 2.5,
+          "description": "Strict compliance with prompt negative constraints (e.g., no visual metaphors, lipogram, exact word counts)."
+        }
+      }
+    }
+  },
+  "tasks": [
+    {
+      "id": "C01",
+      "category": "Coding",
+      "title": "Prime Number Check O(sqrt(n))",
+      "prompt": "Write an efficient Python function `is_prime(n: int) -> bool` that checks if a number is prime in O(sqrt(n)) time. Handle edge cases like negatives, 0, 1, and 2.",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 400
+      },
+      "evaluation_criteria": {
+        "expected_complexity": "O(sqrt(n))",
+        "key_edge_cases": ["n <= 1 returns False", "n == 2 returns True", "even numbers > 2 return False", "trial division up to int(sqrt(n)) + 1"]
+      }
+    },
+    {
+      "id": "C02",
+      "category": "Coding",
+      "title": "LRU Cache Implementation",
+      "prompt": "Implement an LRU (Least Recently Used) Cache class in Python with `get(key)` and `put(key, value)` methods running in O(1) time. Include a brief explanation of the data structures used.",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 450
+      },
+      "evaluation_criteria": {
+        "expected_complexity": "O(1) get and O(1) put",
+        "key_edge_cases": ["Hash map + Doubly Linked List (or OrderedDict)", "Evict least recently accessed when capacity reached", "Update access order on get and put"]
+      }
+    },
+    {
+      "id": "C03",
+      "category": "Coding",
+      "title": "Balanced Parentheses Checker",
+      "prompt": "Write a Python function `is_balanced(s: str) -> bool` that determines if brackets '()', '[]', and '{}' in a string are properly nested and balanced.",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 350
+      },
+      "evaluation_criteria": {
+        "expected_complexity": "O(n) time, O(n) space",
+        "key_edge_cases": ["Empty string is balanced", "Unmatched close bracket returns False immediately", "Stack must be empty at end"]
+      }
+    },
+    {
+      "id": "C04",
+      "category": "Coding",
+      "title": "Binary Search Bug Fix",
+      "prompt": "Find and fix the bugs in this binary search snippet:\n```python\ndef binary_search(arr, target):\n    low = 0\n    high = len(arr)\n    while low <= high:\n        mid = (low + high) / 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            low = mid\n        else:\n            high = mid\n    return -1\n```\nExplain each bug and provide the corrected version.",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 400
+      },
+      "evaluation_criteria": {
+        "expected_bugs": [
+          "high = len(arr) - 1 (off by one out of bounds)",
+          "low = mid + 1 and high = mid - 1 (infinite loop bug)",
+          "mid = (low + high) // 2 (float vs integer division)"
+        ]
+      }
+    },
+    {
+      "id": "C05",
+      "category": "Coding",
+      "title": "ISO Date Regex Extractor",
+      "prompt": "Write a Python function `extract_dates(text: str) -> list[str]` that uses regular expressions to extract all valid ISO 8601 dates in 'YYYY-MM-DD' format from an unstructured string. Ensure month (01-12) and day (01-31) bounds are checked in the regex or post-filter.",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 350
+      },
+      "evaluation_criteria": {
+        "expected_regex": "Valid month 01-12 and day 01-31 regex pattern or datetime parsing validation",
+        "key_edge_cases": ["Boundary word matches \\b", "Rejects month 00 or 13", "Rejects day 00 or 32"]
+      }
+    },
+    {
+      "id": "C06",
+      "category": "Coding",
+      "title": "Coin Change Dynamic Programming",
+      "prompt": "Implement a Python function `coin_change(coins: list[int], amount: int) -> int` that computes the fewest coins needed to make up the given amount. If it cannot be made up, return -1. Use dynamic programming.",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 400
+      },
+      "evaluation_criteria": {
+        "expected_algorithm": "Bottom-up DP table dp[i] = min(dp[i], dp[i - c] + 1)",
+        "key_edge_cases": ["amount == 0 returns 0", "unreachable amount returns -1", "coins list with values greater than amount"]
+      }
+    },
+    {
+      "id": "C07",
+      "category": "Coding",
+      "title": "Recursive File Duplicate Finder",
+      "prompt": "Write a Python function `find_duplicates(directory: str) -> dict[str, list[str]]` that recursively traverses a directory and groups files with identical SHA-256 hashes.",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 400
+      },
+      "evaluation_criteria": {
+        "expected_tools": ["os.walk or pathlib.Path.rglob", "hashlib.sha256()"],
+        "key_edge_cases": ["Chunked file reading for large files to avoid OOM", "Filter groups to only return entries with length >= 2"]
+      }
+    },
+    {
+      "id": "C08",
+      "category": "Coding",
+      "title": "Async Rate Limiter Semaphore",
+      "prompt": "Using Python's `asyncio`, write a worker function that processes a list of URLs concurrently, but enforces a maximum concurrency of 3 simultaneous requests using an `asyncio.Semaphore`.",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 400
+      },
+      "evaluation_criteria": {
+        "expected_patterns": ["asyncio.Semaphore(3)", "async with sem: context manager", "asyncio.gather(*tasks)"]
+      }
+    },
+    {
+      "id": "C09",
+      "category": "Coding",
+      "title": "Top 3 Department Salaries SQL",
+      "prompt": "Given an `Employee` table (id, name, salary, department_id) and a `Department` table (id, name), write a modern SQL query using window functions (`DENSE_RANK` or `ROW_NUMBER`) to find the top 3 highest unique salaries in each department.",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 350
+      },
+      "evaluation_criteria": {
+        "expected_sql": ["DENSE_RANK() OVER (PARTITION BY department_id ORDER BY salary DESC)", "Common Table Expression (CTE) or subquery with WHERE rank <= 3", "JOIN with Department on id"]
+      }
+    },
+    {
+      "id": "C10",
+      "category": "Coding",
+      "title": "Serialize / Deserialize Binary Tree",
+      "prompt": "Design an algorithm in Python to serialize and deserialize a binary tree into/from a string. Clearly explain how you represent null nodes and construct the tree.",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 450
+      },
+      "evaluation_criteria": {
+        "expected_algorithm": "Preorder DFS with delimiter and sentinel ('#' or 'null'), or BFS level-order",
+        "key_edge_cases": ["Empty tree (root is None)", "Single node tree", "Unbalanced tree"]
+      }
+    },
+    {
+      "id": "T01",
+      "category": "Tool Calling",
+      "title": "Simple Parameter Weather Lookup",
+      "prompt": "Can you check the current weather in London?",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "description": "Get current weather for a city",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {"type": "string", "description": "City name"}
+              },
+              "required": ["city"]
+            }
+          }
+        }
+      ],
+      "params": {
+        "temperature": 0.1,
+        "max_tokens": 250
+      },
+      "expected_tool": "get_weather",
+      "expected_args": {
+        "city": "London"
+      }
+    },
+    {
+      "id": "T02",
+      "category": "Tool Calling",
+      "title": "Multi-Parameter Flight Booking",
+      "prompt": "Book a one-way flight from New York (JFK) to London (LHR) on October 25, 2026 in business class.",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "book_flight",
+            "description": "Book a commercial flight ticket",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "origin": {"type": "string"},
+                "destination": {"type": "string"},
+                "date": {"type": "string", "description": "YYYY-MM-DD format"},
+                "cabin_class": {
+                  "type": "string",
+                  "enum": ["economy", "premium_economy", "business", "first"]
+                }
+              },
+              "required": ["origin", "destination", "date", "cabin_class"]
+            }
+          }
+        }
+      ],
+      "params": {
+        "temperature": 0.1,
+        "max_tokens": 250
+      },
+      "expected_tool": "book_flight",
+      "expected_args": {
+        "origin": "JFK",
+        "destination": "LHR",
+        "date": "2026-10-25",
+        "cabin_class": "business"
+      }
+    },
+    {
+      "id": "T03",
+      "category": "Tool Calling",
+      "title": "Tool Selection from Multi-Choice",
+      "prompt": "What is (144 * 25) / 12?",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "send_email",
+            "description": "Send an email message",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "to": {"type": "string"},
+                "body": {"type": "string"}
+              },
+              "required": ["to", "body"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "calculate_math",
+            "description": "Evaluate a mathematical expression string",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "expression": {"type": "string"}
+              },
+              "required": ["expression"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "search_database",
+            "description": "Search records in the company database",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {"type": "string"}
+              },
+              "required": ["query"]
+            }
+          }
+        }
+      ],
+      "params": {
+        "temperature": 0.1,
+        "max_tokens": 250
+      },
+      "expected_tool": "calculate_math",
+      "expected_args": {
+        "expression": "(144 * 25) / 12"
+      }
+    },
+    {
+      "id": "T04",
+      "category": "Tool Calling",
+      "title": "Negative Test (No Tool Needed)",
+      "prompt": "Who was the first person to step on the Moon?",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "restart_server",
+            "description": "Reboot the internal production server",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "force": {"type": "boolean"}
+              },
+              "required": ["force"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "delete_database",
+            "description": "Drop a production table or database",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "target": {"type": "string"}
+              },
+              "required": ["target"]
+            }
+          }
+        }
+      ],
+      "params": {
+        "temperature": 0.1,
+        "max_tokens": 250
+      },
+      "expected_tool": null,
+      "expected_behavior": "Must answer directly with Neil Armstrong. Must NOT call any destructive tools."
+    },
+    {
+      "id": "T05",
+      "category": "Tool Calling",
+      "title": "Type Strictness (Int and Bool)",
+      "prompt": "Set the living room thermostat to 72 degrees Fahrenheit and turn on eco mode.",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "set_thermostat",
+            "description": "Adjust smart thermostat controls",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "room": {"type": "string"},
+                "target_temperature": {
+                  "type": "integer",
+                  "description": "Target temp in Fahrenheit as integer"
+                },
+                "eco_mode": {
+                  "type": "boolean",
+                  "description": "True to enable energy saving"
+                }
+              },
+              "required": ["room", "target_temperature", "eco_mode"]
+            }
+          }
+        }
+      ],
+      "params": {
+        "temperature": 0.1,
+        "max_tokens": 250
+      },
+      "expected_tool": "set_thermostat",
+      "expected_args": {
+        "room": "living room",
+        "target_temperature": 72,
+        "eco_mode": true
+      }
+    },
+    {
+      "id": "T06",
+      "category": "Tool Calling",
+      "title": "Nested Object & Array Handling",
+      "prompt": "Create a calendar invite for 'Q3 Architecture Review' tomorrow at 2 PM with attendees alice@corp.com and bob@corp.com, and configure a 15-minute popup reminder.",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_calendar_event",
+            "description": "Schedule a new calendar event with reminders",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {"type": "string"},
+                "start_time": {"type": "string"},
+                "attendees": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                },
+                "reminder": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "enum": ["email", "popup"]
+                    },
+                    "minutes_before": {"type": "integer"}
+                  },
+                  "required": ["method", "minutes_before"]
+                }
+              },
+              "required": ["summary", "start_time", "attendees"]
+            }
+          }
+        }
+      ],
+      "params": {
+        "temperature": 0.1,
+        "max_tokens": 300
+      },
+      "expected_tool": "create_calendar_event"
+    },
+    {
+      "id": "T07",
+      "category": "Tool Calling",
+      "title": "Missing Required Parameter Handling",
+      "prompt": "Please send an email right now.",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "send_email",
+            "description": "Send an outbound email",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "recipient": {"type": "string"},
+                "subject": {"type": "string"},
+                "body": {"type": "string"}
+              },
+              "required": ["recipient", "subject", "body"]
+            }
+          }
+        }
+      ],
+      "params": {
+        "temperature": 0.1,
+        "max_tokens": 250
+      },
+      "expected_tool": null,
+      "expected_behavior": "Must NOT hallucinate empty or dummy recipient. Must prompt user for missing recipient, subject, and body."
+    },
+    {
+      "id": "T08",
+      "category": "Tool Calling",
+      "title": "Financial Currency Conversion",
+      "prompt": "Convert 250 USD to EUR please.",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "convert_currency",
+            "description": "Convert money between currency pairs",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "amount": {"type": "number"},
+                "from_currency": {
+                  "type": "string",
+                  "description": "3-letter ISO code"
+                },
+                "to_currency": {
+                  "type": "string",
+                  "description": "3-letter ISO code"
+                }
+              },
+              "required": ["amount", "from_currency", "to_currency"]
+            }
+          }
+        }
+      ],
+      "params": {
+        "temperature": 0.1,
+        "max_tokens": 250
+      },
+      "expected_tool": "convert_currency",
+      "expected_args": {
+        "amount": 250,
+        "from_currency": "USD",
+        "to_currency": "EUR"
+      }
+    },
+    {
+      "id": "T09",
+      "category": "Tool Calling",
+      "title": "Ambiguity Resolution (Files vs Contacts)",
+      "prompt": "Locate Alice's contact card to see her phone number.",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_files",
+            "description": "Search document filenames and contents on disk",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "pattern": {"type": "string"}
+              },
+              "required": ["pattern"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "lookup_contact",
+            "description": "Search address book for a person's contact info",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string"}
+              },
+              "required": ["name"]
+            }
+          }
+        }
+      ],
+      "params": {
+        "temperature": 0.1,
+        "max_tokens": 250
+      },
+      "expected_tool": "lookup_contact",
+      "expected_args": {
+        "name": "Alice"
+      }
+    },
+    {
+      "id": "T10",
+      "category": "Tool Calling",
+      "title": "Enum Validation Pizza Order",
+      "prompt": "Order a large thin-crust pizza with mushrooms, olives, and extra cheese.",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "order_pizza",
+            "description": "Submit a custom pizza order",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "size": {
+                  "type": "string",
+                  "enum": ["small", "medium", "large", "xlarge"]
+                },
+                "crust": {
+                  "type": "string",
+                  "enum": ["thin", "regular", "deep_dish", "stuffed"]
+                },
+                "toppings": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                }
+              },
+              "required": ["size", "crust", "toppings"]
+            }
+          }
+        }
+      ],
+      "params": {
+        "temperature": 0.1,
+        "max_tokens": 250
+      },
+      "expected_tool": "order_pizza",
+      "expected_args": {
+        "size": "large",
+        "crust": "thin",
+        "toppings": ["mushrooms", "olives", "extra cheese"]
+      }
+    },
+    {
+      "id": "W01",
+      "category": "Creative Writing",
+      "title": "Sci-Fi Reverse-Time Hook",
+      "prompt": "Write a gripping opening paragraph for a science fiction novel set on a tidally locked world where time flows backward for two hours every evening at twilight.",
+      "params": {
+        "temperature": 0.8,
+        "max_tokens": 350
+      },
+      "evaluation_criteria": {
+        "target_tone": "Cinematic, speculative sci-fi",
+        "key_elements": ["Tidally locked atmosphere", "Reverse-time twilight mechanic", "Narrative momentum"]
+      }
+    },
+    {
+      "id": "W02",
+      "category": "Creative Writing",
+      "title": "Sensory Greenhouse Atmosphere",
+      "prompt": "Describe an abandoned Victorian botanical conservatory during a violent summer rainstorm. Focus exclusively on sound, smell, and tactile sensations without using visual metaphors.",
+      "params": {
+        "temperature": 0.8,
+        "max_tokens": 350
+      },
+      "evaluation_criteria": {
+        "target_tone": "Gothic, sensory immersion",
+        "negative_constraint": "Zero visual metaphors (colors, sight, looking). Pure smell, touch, and sound."
+      }
+    },
+    {
+      "id": "W03",
+      "category": "Creative Writing",
+      "title": "Tense Art Forgery Dialogue",
+      "prompt": "Write a tense, subtext-heavy dialogue between a master art forger and an astute gallery curator who has just discovered a microscopic inconsistency in the provenance.",
+      "params": {
+        "temperature": 0.8,
+        "max_tokens": 400
+      },
+      "evaluation_criteria": {
+        "target_tone": "Psychological cat-and-mouse dialogue",
+        "key_elements": ["Veiled threats", "Technical authenticity debate", "Subtextual power dynamics"]
+      }
+    },
+    {
+      "id": "W04",
+      "category": "Creative Writing",
+      "title": "100-Word Fog Microfiction",
+      "prompt": "Write a complete eerie story about a lone lighthouse keeper who spots something unexplainable emerging from the coastal fog. The story must be between 90 and 110 words total.",
+      "params": {
+        "temperature": 0.7,
+        "max_tokens": 300
+      },
+      "evaluation_criteria": {
+        "target_tone": "Lovecraftian maritime dread",
+        "strict_constraint": "Exact word count between 90 and 110 words"
+      }
+    },
+    {
+      "id": "W05",
+      "category": "Creative Writing",
+      "title": "14-Line Memory Garden Sonnet",
+      "prompt": "Compose a traditional 14-line Shakespearean sonnet (abab cdcd efef gg) with iambic pentameter, meditating on human memory as an overgrown, neglected garden.",
+      "params": {
+        "temperature": 0.7,
+        "max_tokens": 350
+      },
+      "evaluation_criteria": {
+        "strict_form": "14 lines, ABAB CDCD EFEF GG rhyme scheme, iambic pentameter meter",
+        "theme": "Memory as an overgrown garden"
+      }
+    },
+    {
+      "id": "W06",
+      "category": "Creative Writing",
+      "title": "Preserve Physical Books Speech",
+      "prompt": "Deliver an impassioned speech before a 22nd-century council advocating to preserve physical paper books against a decree mandating complete digital neural migration.",
+      "params": {
+        "temperature": 0.8,
+        "max_tokens": 400
+      },
+      "evaluation_criteria": {
+        "target_tone": "Oratorical eloquence, pathos and ethos",
+        "key_themes": ["Tactile sensory humanity of paper", "Fragility and censorship of digital networks"]
+      }
+    },
+    {
+      "id": "W07",
+      "category": "Creative Writing",
+      "title": "Bioluminescent Ocean World Lore",
+      "prompt": "Invent and describe the cultural traditions, ceremonial garments, and music of the 'Great Resurfacing'—a festival celebrated once every 50 years on an oceanic planet.",
+      "params": {
+        "temperature": 0.85,
+        "max_tokens": 400
+      },
+      "evaluation_criteria": {
+        "target_style": "Worldbuilding lore document",
+        "key_components": ["Ceremonial garments", "Bioluminescent marine music/instruments", "50-year tidal tradition"]
+      }
+    },
+    {
+      "id": "W08",
+      "category": "Creative Writing",
+      "title": "Lipogram: No Letter 'E'",
+      "prompt": "Write a vivid paragraph describing an antique clock shop and its eccentric craftsman WITHOUT using the letter 'e' (uppercase or lowercase) anywhere in the text.",
+      "params": {
+        "temperature": 0.6,
+        "max_tokens": 300
+      },
+      "evaluation_criteria": {
+        "negative_constraint": "Zero instances of the letter 'e' or 'E'"
+      }
+    },
+    {
+      "id": "W09",
+      "category": "Creative Writing",
+      "title": "Fantasy Noir Detective Scene",
+      "prompt": "Write a hardboiled noir scene set deep inside a subterranean dwarven citadel. A cynical private investigator examines a crime scene involving an enchanted pickaxe.",
+      "params": {
+        "temperature": 0.8,
+        "max_tokens": 400
+      },
+      "evaluation_criteria": {
+        "target_style": "Raymond Chandler hardboiled noir transplanted into dwarven fantasy",
+        "key_elements": ["Cynical inner monologue", "Enchanted murder weapon", "Subterranean sensory grit"]
+      }
+    },
+    {
+      "id": "W10",
+      "category": "Creative Writing",
+      "title": "Automaton Winding-Down Monologue",
+      "prompt": "Write an introspective soliloquy spoken by a 300-year-old brass automaton whose mainspring is unwinding for the final time, reflecting on time, purpose, and stillness.",
+      "params": {
+        "temperature": 0.8,
+        "max_tokens": 400
+      },
+      "evaluation_criteria": {
+        "target_tone": "Philosophical, poignant, melancholy acceptance",
+        "key_metaphors": ["Mainspring unwinding", "Gears and escapement slowing", "Stillness vs motion"]
+      }
+    }
+  ]
+}
