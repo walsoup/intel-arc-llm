@@ -1,6 +1,19 @@
-# llama.cpp/tools/cli
+# Intel Arc LLM Inference Environment & Optimization Suite
 
-## Usage
+A portable, high-performance local LLM inference environment powered by `llama.cpp` (`llama-server`) optimized specifically for **Intel Core Ultra (Meteor Lake / Lunar Lake / Arrow Lake)** chips with **Intel Arc iGPU (Mesa ANV Vulkan & DP4A vector acceleration)**.
+
+---
+
+## 🚀 Quick Documentation Links
+
+- 📖 **[Comprehensive Intel Arc LLM Optimization Guide](./INTEL_ARC_LLM_OPTIMIZATION_GUIDE.md)**: Deep dive into the memory wall, 128-bit DDR5 roofline physics, DP4A vector shaders, hardware clock pinning, and 15–25+ TPS speculative decoding.
+- 📘 **[Repository & AI Agent Manual (AGENTS.md)](./AGENTS.md)**: Architecture, model benchmark suite (30-task tri-domain evaluator), and directory structure.
+- ⚡ **Hardware Performance Tuner**: `sudo ./scripts/tune-hardware.sh` (locks GPU boost to 2200 MHz, CPU governor to performance, THP).
+- 🌐 **1-Click Linux Launcher**: `./start-server.sh` (launches router server on port 8080 with `--spec-type ngram-mod`).
+
+---
+
+## 🛠️ Usage & CLI Reference
 
 <!-- HELP_START -->
 
